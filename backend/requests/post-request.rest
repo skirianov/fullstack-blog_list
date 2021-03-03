@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+  "title": "This is what happens, when you make your wife mad",
+  "author": "Sergii Kirianov",
+  "url": "https://github.com/skirianov/fullstack-blog_list",
+  "likes": 10
+}
