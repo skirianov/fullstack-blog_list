@@ -91,6 +91,42 @@ test('if submitted without title and url, status code 400', async () => {
   expect(blogsAfter).toHaveLength(helper.initialBlogs.length);
 });
 
+test('the specific blog can be deleted', async () => {
+  const blogsBefore = await helper.blogsFromDb();
+  const blogToDelete = blogsBefore[0];
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204);
+
+  const blogsAfter = await helper.blogsFromDb();
+
+  expect(blogToDelete).not.toContain(blogsAfter);
+  expect(blogsAfter).toHaveLength(blogsBefore.length - 1);
+});
+
+test('update specific blog', async () => {
+  const blogsBefore = await helper.blogsFromDb();
+  const updatingBlog = blogsBefore[0];
+
+  const newBlog = {
+    title: updatingBlog.title,
+    author: updatingBlog.author,
+    url: updatingBlog.url,
+    likes: updatingBlog.likes + 1,
+  };
+
+  await api
+    .put(`/api/blogs/${updatingBlog.id}`)
+    .send(newBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/);
+
+  const blogsAfter = await helper.blogsFromDb();
+  const updatedBlog = blogsAfter[0];
+
+  expect(updatedBlog.likes).toBe(updatingBlog.likes + 1);
+});
 afterAll(() => {
   mongoose.connection.close();
 })
