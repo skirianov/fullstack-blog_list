@@ -164,6 +164,62 @@ describe('when already one entry in DB', () => {
     const usernames = usersAfter.map((user) => user.username);
     expect(usernames).toContain(newUser.username);
   });
+
+  test('user is not added if username is missing', async () => {
+    const usersBefore = await helper.usersFromDb();
+
+    const newUser = {
+      name: 'test',
+      password: 'test',
+    };
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/);
+
+    const usersAfter = await helper.usersFromDb();
+    expect(usersAfter).toHaveLength(usersBefore.length);
+  });
+
+  test('user is not added if password is missing', async () => {
+    const usersBefore = await helper.usersFromDb();
+
+    const newUser = {
+      username: 'test',
+      name: 'test',
+    };
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/);
+
+    const usersAfter = await helper.usersFromDb();
+    expect(usersAfter).toHaveLength(usersBefore.length);
+  });
+
+  test('user is not added if password or username is less than 3 characters long', async () => {
+    const usersBefore = await helper.usersFromDb();
+
+    const newUser = {
+      username: 'test12',
+      name: 'test',
+      password: 'qq',
+    };
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/);
+
+    const usersAfter = await helper.usersFromDb();
+    expect(usersAfter).toHaveLength(usersBefore.length);
+  });
+
 });
 
 afterAll(() => {
