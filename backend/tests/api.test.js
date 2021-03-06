@@ -2,10 +2,12 @@ const supertest = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../app');
 const helper = require('./test_helper');
+const bcrypt = require('bcrypt');
 
 const api = supertest(app);
 
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
 beforeEach(async () => {
   await Blog.deleteMany();
@@ -127,6 +129,43 @@ test('update specific blog', async () => {
 
   expect(updatedBlog.likes).toBe(updatingBlog.likes + 1);
 });
+
+describe('when already one entry in DB', () => {
+  beforeEach(async () => {
+    await User.deleteMany();
+
+    const passwordHash = await bcrypt.hash('test', 10);
+    const user = new User({
+      username: 'test',
+      passwordHash,
+    });
+
+    await user.save();
+  });
+
+  test('post a new user', async () => {
+    const usersBefore = await helper.usersFromDb();
+
+    const newUser = {
+      username: 'test-test',
+      name: 'testing user',
+      password: 'testtest',
+    };
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+
+    const usersAfter = await helper.usersFromDb();
+    expect(usersAfter).toHaveLength(usersBefore.length + 1);
+
+    const usernames = usersAfter.map((user) => user.username);
+    expect(usernames).toContain(newUser.username);
+  });
+});
+
 afterAll(() => {
   mongoose.connection.close();
-})
+});
