@@ -52,8 +52,21 @@ blogsRouter.get('/:id', async (request, response) => {
 });
 
 blogsRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndRemove(request.params.id);
-  response.status(204).end();
+  const decodedToken = jwt.verify(request.token, process.env.TOKEN);
+
+  const user = await User.findById(decodedToken.id);
+
+  if (!request.token || !decodedToken.id) {
+    response.status(401).json({ error: 'unauthorized access' });
+  }
+
+  const blog = await Blog.findById(request.params.id);
+  if (blog.user.toString() === user._id.toString()) {
+    await Blog.findByIdAndRemove(request.params.id);
+    response.status(204).end();
+  } else {
+    response.status(401).json({ error: 'unauthorized token' });
+  }
 });
 
 blogsRouter.put('/:id', async (request, response) => {
