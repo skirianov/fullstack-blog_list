@@ -1,0 +1,11 @@
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNlZXIxd2UiLCJpZCI6IjYwNDNmN2RkNTJkOThiMWNjN2U5ZTRkMiIsImlhdCI6MTYxNTA3MDI3MX0.thQjKWjNXXSrdfCpeIubk8eosImtl6VqFC18kLPMeac
+
+{
+  "title": "Testing tokenExtractor middleware",
+  "author": "Sergii Kirianov",
+  "url": "resrw",
+  "likes": 10,
+  "userId": "6043f7dd52d98b1cc7e9e4d2"
+}

@@ -1,14 +1,23 @@
 const blogsRouter = require('express').Router();
+const jwt = require('jsonwebtoken');
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
 blogsRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({});
+  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 });
   response.json(blogs);
 });
 
 blogsRouter.post('/', async (request, response) => {
   const { body } = request;
+  const decodeToken = jwt.verify(request.token, process.env.TOKEN);
+  console.log(decodeToken);
 
+  if (!request.token || !decodeToken.id) {
+    response.status(401).json({ error: 'unauthorized access, token is missing' });
+  }
+
+  const user = await User.findById(decodeToken.id);
   if (!body.likes) {
     body.likes = 0;
   }
@@ -21,11 +30,14 @@ blogsRouter.post('/', async (request, response) => {
       author: body.author,
       url: body.url,
       likes: body.likes,
+      user: user._id,
     });
 
-    console.log(blog_post);
-    const result = await blog_post.save();
-    response.json(result);
+    const savedBlog = await blog_post.save();
+    user.blogs = user.blogs.concat(savedBlog._id);
+    await user.save();
+
+    response.json(savedBlog);
   }
 });
 
