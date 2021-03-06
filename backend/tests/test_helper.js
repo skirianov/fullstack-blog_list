@@ -7,12 +7,14 @@ const initialBlogs = [
     author: 'Sergii Kirianov',
     url: 'lalalala.com',
     likes: 14,
+    user: '60441416aba8fc620198f053',
   },
   {
     title: 'Second blog post',
-    author: 'Sergii Kirianov',
+    author: 'sosro',
     url: 'bridged.com',
     likes: 3,
+    user: '60441416aba8fc620198f053',
   },
 ];
 
