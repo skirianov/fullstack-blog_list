@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt');
-const Blog = require('../models/blog');
 const usersRouter = require('express').Router();
 const User = require('../models/user');
 
@@ -25,8 +24,8 @@ usersRouter.post('/', async (request, response) => {
       passwordHash,
     });
 
-    const savedUser = await user.save();
-  };
+    await user.save();
+  }
 });
 
 module.exports = usersRouter;
